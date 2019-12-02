@@ -6,9 +6,9 @@ local step_count = 20
 local results = {}
 
 collectgarbage('stop')
-local previous_memory = collectgarbage('count')
 
 local function start_world(classes_name)
+	local start_memory = collectgarbage('count')
 	local classes = require('classes.' .. classes_name)
 	local map = map_class.new(1000, 1000)
 
@@ -16,7 +16,7 @@ local function start_world(classes_name)
 
 	local start_time = os.clock()
 
-	for i = 1, math.floor(object_count / 10) do
+	for i = 1, math.floor(object_count) do
 		local flower = classes.new_flower(math.random(0, map.width - 1), math.random(0, map.height - 1))
 		map:enter(flower)
 		table.insert(map.objects, flower)
@@ -47,7 +47,6 @@ local function start_world(classes_name)
 
 	local simulation_time = os.clock()
 
-	local memory = collectgarbage('count')
 	local result = {
 		name = classes_name,
 		creation = creation_time - start_time,
@@ -55,7 +54,7 @@ local function start_world(classes_name)
 		flowers = 0,
 		humans = 0,
 		zombies = 0,
-		memory = memory - previous_memory
+		memory = collectgarbage('count') - start_memory
 	}
 	previous_memory = memory
 
@@ -75,9 +74,9 @@ local function start_world(classes_name)
 	table.insert(results, result)
 end
 
-start_world('mt')
 start_world('plain')
 start_world('predef')
+start_world('mt')
 
 -- Find minimal times.
 local min_creation_time, min_simulation_time = results[1].creation, results[1].simulation
