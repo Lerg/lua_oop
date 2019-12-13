@@ -4,7 +4,7 @@ local function new_sock()
     local sock = {
         color = sock_colors[math.random(#sock_colors)],
         has_pair = false,
-        is_lost = true
+        is_lost = false
     }
 
     local protected = {
@@ -67,7 +67,7 @@ local pairable_interface = {
 
 local function implements(object, interface)
     for k, v in pairs(interface) do
-        if not object[k] or type(object[k]) ~= v then
+        if object[k] == nil or type(object[k]) ~= v then
             return false
         end
     end
@@ -110,3 +110,47 @@ add_mixin(sock1, stinky_mixin)
 sock1:stink()
 
 print('is_stinking', sock1.is_stinking, sock1:get_is_stinking())
+
+local function mt_index(base_class)
+    return function(t, k)
+        print('name', rawget(t, 'name'))
+        return base_class[k]
+    end
+end
+
+local class0 = {
+    name = 'class0',
+    class0 = true
+}
+
+local class1 = {
+    name = 'class1',
+    class1 = true
+}
+setmetatable(class1, {__index = class0})
+--setmetatable(class1, {__index = mt_index(class0)})
+
+local class2 = {
+    name = 'class2',
+    class2 = true
+}
+setmetatable(class2, {__index = class1})
+--setmetatable(class2, {__index = mt_index(class1)})
+
+local class3 = {
+    name = 'class3',
+    class3 = true
+}
+setmetatable(class3, {__index = class2})
+--setmetatable(class3, {__index = mt_index(class2)})
+
+local function new_object3()
+    local object = {}
+    setmetatable(object, {__index = class3})
+    --setmetatable(object, {__index = mt_index(class3)})
+    return object
+end
+
+local object3 = new_object3()
+
+print(object3.class0)

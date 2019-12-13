@@ -2,7 +2,7 @@ local _M = {}
 
 -- Flower.
 
-local flowe_class = {
+local flower_class = {
 	is_flower = true
 }
 
@@ -10,7 +10,7 @@ function _M.new_flower(x, y)
 	local flower = {
 		x = x, y = y
 	}
-	setmetatable(flower, {__index = flowe_class})
+	setmetatable(flower, {__index = flower_class})
 	return flower
 end
 
