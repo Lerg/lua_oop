@@ -37,4 +37,4 @@ Here's new results:
 
 
 
-How you can see new meta's are better at creation but quite lacks on simulation part.
+How you can see new meta's are better at creation but quite lacks on simulation part, also new meta's eat significantly less memory.
