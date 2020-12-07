@@ -1,4 +1,5 @@
 local map_class = require('map')
+_G.new = setmetatable
 
 local object_count = 100000
 local step_count = 20
@@ -11,36 +12,78 @@ local function start_world(classes_name)
 	local start_memory = collectgarbage('count')
 	local classes = require('classes.' .. classes_name)
 	local map = map_class.new(1000, 1000)
-
+	local start_time = 0
 	math.randomseed(69)
+	if classes_name == 'new_mt' then
+		start_time = os.clock()
 
-	local start_time = os.clock()
+		for i = 1, math.floor(object_count) do
+			local flower = new(
+				{
+					x = math.random(0, map.width - 1); 
+					y = math.random(0, map.height - 1);
+				},
+				classes.flower
+			)
+			map:enter(flower)
+			table.insert(map.objects, flower)
+		end
 
-	for i = 1, math.floor(object_count) do
-		local flower = classes.new_flower(math.random(0, map.width - 1), math.random(0, map.height - 1))
-		map:enter(flower)
-		table.insert(map.objects, flower)
+		for i = 1, object_count do
+			local human = new(
+				{
+					x = math.random(0, map.width - 1); 
+					y = math.random(0, map.height - 1);
+					
+				},
+				classes.human
+			)
+			map:enter(human)
+			table.insert(map.objects, human)
+		end
+
+		for i = 1, object_count do
+			local zombie = new(
+				{
+					x = math.random(0, map.width - 1); 
+					y = math.random(0, map.height - 1);
+					
+				},
+				classes.zombie
+			)
+			map:enter(zombie)
+			table.insert(map.objects, zombie)
+		end
+	else
+		start_time = os.clock()
+
+		for i = 1, math.floor(object_count) do
+			local flower = classes.new_flower(math.random(0, map.width - 1), math.random(0, map.height - 1))
+			map:enter(flower)
+			table.insert(map.objects, flower)
+		end
+
+		for i = 1, object_count do
+			local human = classes.new_human(math.random(0, map.width - 1), math.random(0, map.height - 1))
+			map:enter(human)
+			table.insert(map.objects, human)
+		end
+
+		for i = 1, object_count do
+			local zombie = classes.new_zombie(math.random(0, map.width - 1), math.random(0, map.height - 1))
+			map:enter(zombie)
+			table.insert(map.objects, zombie)
+		end
 	end
-
-	for i = 1, object_count do
-		local human = classes.new_human(math.random(0, map.width - 1), math.random(0, map.height - 1))
-		map:enter(human)
-		table.insert(map.objects, human)
-	end
-
-	for i = 1, object_count do
-		local zombie = classes.new_zombie(math.random(0, map.width - 1), math.random(0, map.height - 1))
-		map:enter(zombie)
-		table.insert(map.objects, zombie)
-	end
-
 	local creation_time = os.clock()
 
 	for i = 1, step_count do
 		for j = 1, #map.objects do
 			local object = map.objects[j]
 			if not object.is_invalid and object.update then
+				
 				object:update(map)
+
 			end
 		end
 	end
@@ -76,7 +119,8 @@ end
 
 start_world('plain')
 start_world('predef')
-start_world('mt')
+start_world('new_mt')
+
 
 -- Find minimal times.
 local min_creation_time, min_simulation_time = results[1].creation, results[1].simulation
@@ -107,3 +151,4 @@ for i = 1, #results do
 		'f: ' .. f(r.flowers, 0) .. ' h: ' .. f(r.humans, 0) .. ' z: ' .. f(r.zombies, 0)
 	)
 end
+io.read()
